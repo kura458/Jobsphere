@@ -8,8 +8,8 @@ import com.jobsphere.jobsite.model.User;
 import com.jobsphere.jobsite.repository.UserRepository;
 import com.jobsphere.jobsite.service.auth.AuthService;
 import com.jobsphere.jobsite.service.auth.GoogleAuthService;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
+import com.jobsphere.jobsite.service.auth.AuthService;
+import com.jobsphere.jobsite.config.security.JwtCookieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,64 +24,28 @@ public class RoleController {
     private final GoogleAuthService googleAuthService;
     private final AuthService authService;
     private final JwtCookieService jwtCookieService;
-    private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/select-role")
     @Transactional
     public ResponseEntity<Map<String, Object>> selectRole(
-            @Valid @RequestBody SelectRoleRequest request,
-            HttpServletResponse response) {
-        
-        if (request.getTempToken() == null) {
-            throw new AuthException("Temp token required");
-        }
-        
-        String email = jwtTokenProvider.getSubject(request.getTempToken());
-        Map<String, Object> claims = jwtTokenProvider.getClaims(request.getTempToken());
-        
-        if (!"ROLE_SELECTION".equals(claims.get("purpose"))) {
-            throw new AuthException("Invalid token for role selection");
-        }
-        
-        Map<String, Object> result;
-        
-        if (request.getGoogleId() != null) {
-            result = googleAuthService.createUserFromGoogle(
-                email, request.getName(), request.getGoogleId(), request.getUserType());
-        } else {
-            result = updateEmailUserRole(email, request.getUserType());
-        }
-        
+            @RequestParam String email,
+            @RequestParam String googleId,
+            @RequestParam String name,
+            @RequestParam UserType userType,
+            jakarta.servlet.http.HttpServletResponse response) {
+
+        Map<String, Object> result = googleAuthService.createUserFromGoogle(
+                email, name, googleId, userType);
+
         String accessToken = (String) result.get("token");
-        String refreshToken = authService.createRefreshToken(email);
+        String resultEmail = (String) result.get("email");
+
+        // Create Refresh Token
+        String refreshToken = authService.createRefreshToken(resultEmail);
+
+        // Set Cookies
         jwtCookieService.setUserCookies(response, accessToken, refreshToken);
-        
+
         return ResponseEntity.ok(result);
-    }
-    
-    private Map<String, Object> updateEmailUserRole(String email, com.jobsphere.jobsite.constant.UserType userType) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new AuthException("User not found"));
-        
-        if (user.getUserType() != null) {
-            throw new AuthException("User already has a role assigned");
-        }
-        
-        user.setUserType(userType);
-        user.setLastLogin(Instant.now());
-        userRepository.save(user);
-        
-        String accessToken = jwtTokenProvider.createUserToken(email, userType.name());
-        String refreshToken = authService.createRefreshToken(email);
-        
-        return Map.of(
-            "token", accessToken,
-            "refreshToken", refreshToken,
-            "email", email,
-            "userType", userType,
-            "needsRoleSelection", false,
-            "message", "Role selected successfully"
-        );
     }
 }
