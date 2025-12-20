@@ -1,19 +1,21 @@
 package com.jobsphere.jobsite.dto.seeker;
-import com.jobsphere.jobsite.model.seeker.Seeker.Gender;
-import lombok.*;
+
+import com.jobsphere.jobsite.constant.Gender;
+import lombok.Builder;
+import lombok.Data;
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class SeekerBasicInfoDto {
+public class BasicInfoResponse {
+    private UUID id;
     private String firstName;
     private String middleName;
     private String lastName;
     private String phone;
     private Gender gender;
     private LocalDate dateOfBirth;
-    private UUID addressId;
+    private String email;
+    private String profileCompletion;
 }

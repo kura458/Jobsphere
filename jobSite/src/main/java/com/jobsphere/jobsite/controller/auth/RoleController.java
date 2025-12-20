@@ -1,4 +1,5 @@
 package com.jobsphere.jobsite.controller.auth;
+
 import com.jobsphere.jobsite.constant.UserType;
 import com.jobsphere.jobsite.config.security.JwtCookieService;
 import com.jobsphere.jobsite.config.security.JwtTokenProvider;
@@ -32,49 +33,49 @@ public class RoleController {
     public ResponseEntity<Map<String, Object>> selectRole(
             @Valid @RequestBody SelectRoleRequest request,
             HttpServletResponse response) {
-        
+
         if (request.getTempToken() == null) {
             throw new AuthException("Temp token required");
         }
-        
+
         String email = jwtTokenProvider.getSubject(request.getTempToken());
         Map<String, Object> claims = jwtTokenProvider.getClaims(request.getTempToken());
-        
+
         if (!"ROLE_SELECTION".equals(claims.get("purpose"))) {
             throw new AuthException("Invalid token for role selection");
         }
-        
+
         Map<String, Object> result;
-        
+
         if (request.getGoogleId() != null) {
             result = googleAuthService.createUserFromGoogle(
                 email, request.getName(), request.getGoogleId(), request.getUserType());
         } else {
-            result = updateEmailUserRole(email, request.getUserType());
+            result = updateEmailUserRoleManaged(email, request.getUserType());
         }
-        
+
         String accessToken = (String) result.get("token");
         String refreshToken = authService.createRefreshToken(email);
         jwtCookieService.setUserCookies(response, accessToken, refreshToken);
-        
+
         return ResponseEntity.ok(result);
     }
-    
-    private Map<String, Object> updateEmailUserRole(String email, com.jobsphere.jobsite.constant.UserType userType) {
+
+    private Map<String, Object> updateEmailUserRoleManaged(String email, UserType userType) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new AuthException("User not found"));
-        
+
         if (user.getUserType() != null) {
             throw new AuthException("User already has a role assigned");
         }
-        
+
         user.setUserType(userType);
         user.setLastLogin(Instant.now());
-        userRepository.save(user);
-        
+        // No need to call save(user); the user is managed in the same @Transactional call
+
         String accessToken = jwtTokenProvider.createUserToken(email, userType.name());
         String refreshToken = authService.createRefreshToken(email);
-        
+
         return Map.of(
             "token", accessToken,
             "refreshToken", refreshToken,

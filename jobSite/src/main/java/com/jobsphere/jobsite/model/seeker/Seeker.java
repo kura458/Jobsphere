@@ -1,32 +1,42 @@
 package com.jobsphere.jobsite.model.seeker;
-import com.jobsphere.jobsite.model.User;
-import com.jobsphere.jobsite.model.shared.Address;
+
+import com.jobsphere.jobsite.constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
-import java.time.Instant;
 import java.util.UUID;
-@Entity @Table(name = "seekers")
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+
+@Entity
+@Table(name = "seekers")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Seeker {
-    @Id private UUID id;
-    
-    @OneToOne @MapsId @JoinColumn(name = "id")
-    private User user;
-    
-    @Column(name = "first_name", nullable = false) private String firstName;
-    @Column(name = "middle_name", nullable = false) private String middleName;
-    @Column(name = "last_name") private String lastName;
-    @Column(nullable = false) private String phone;
-    @Enumerated(EnumType.STRING) private Gender gender;
-    @Column(name = "date_of_birth") private LocalDate dateOfBirth;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
-    private Address address;
-    
-    @Column(name = "created_at") private Instant createdAt;
-    @Column(name = "updated_at") private Instant updatedAt;
-    
-    public enum Gender { MALE, FEMALE }
+    @Id
+    @Column(name = "id")
+    private UUID id;
+
+    @Column(name = "first_name", length = 100, nullable = false)
+    private String firstName;
+
+    @Column(name = "middle_name", length = 100, nullable = false)
+    private String middleName;
+
+    @Column(name = "last_name", length = 100)
+    private String lastName;
+
+    @Column(length = 20, nullable = false)
+    private String phone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private Gender gender;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "address_id")
+    private UUID addressId;
 }
