@@ -1,3 +1,5 @@
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\CloudinaryConfig.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\OpenApiConfig.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\persistence\JpaConfig.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\security\AdminSecurityConfig.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\security\JwtAuthenticationFilter.java
@@ -7,6 +9,7 @@ C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobspher
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\security\JwtUtilsConfig.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\security\PasswordEncoderConfig.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\config\security\SecurityConfig.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\constant\Gender.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\constant\OtpType.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\constant\Role.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\constant\UserType.java
@@ -14,7 +17,8 @@ C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobspher
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\controller\auth\AuthController.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\controller\auth\OAuthSuccessController.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\controller\auth\RoleController.java
-C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\controller\seeker\SeekerBasicInfoController.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\controller\seeker\SeekerProfileController.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\controller\shared\AddressController.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\admin\AdminLoginRequest.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\admin\AdminOtpRequest.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\admin\AdminResetPasswordRequest.java
@@ -27,11 +31,13 @@ C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobspher
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\auth\SelectRoleRequest.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\auth\SetRoleRequest.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\auth\VerifyResetOtpRequest.java
-C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\seeker\SeekerBasicInfoDto.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\seeker\BasicInfoRequest.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\seeker\BasicInfoResponse.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\dto\shared\AddressDto.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\exception\AuthException.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\exception\GlobalExceptionHandler.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\exception\OtpException.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\exception\ResourceNotFoundException.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\JobSiteApplication.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\model\admin\Admin.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\model\admin\AdminOtp.java
@@ -56,7 +62,9 @@ C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobspher
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\service\auth\GoogleAuthService.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\service\auth\LogoutService.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\service\auth\OtpService.java
-C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\service\seeker\SeekerBasicInfoService.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\service\seeker\SeekerService.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\service\shared\AddressService.java
+C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\service\shared\CloudinaryImageService.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\utils\DateUtils.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\utils\EmailTemplateBuilder.java
 C:\Users\Hp\Desktop\HireNestBackend\Jobsphere\jobSite\src\main\java\com\jobsphere\jobsite\utils\JwtUtils.java
