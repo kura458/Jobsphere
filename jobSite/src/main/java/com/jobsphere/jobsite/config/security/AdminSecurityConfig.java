@@ -22,7 +22,7 @@ public class AdminSecurityConfig {
         http
                 .securityMatcher("/api/v1/admin/**")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .csrf().disable()
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/admin/auth/**").permitAll()

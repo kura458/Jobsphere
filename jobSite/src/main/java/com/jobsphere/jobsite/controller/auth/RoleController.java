@@ -1,6 +1,4 @@
-
 package com.jobsphere.jobsite.controller.auth;
-
 import com.jobsphere.jobsite.constant.UserType;
 import com.jobsphere.jobsite.dto.auth.SetRoleRequest;
 import jakarta.validation.Valid;
@@ -9,7 +7,9 @@ import com.jobsphere.jobsite.service.auth.AuthService;
 import com.jobsphere.jobsite.config.security.JwtCookieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import java.time.Instant;
 import java.util.Map;
 
 @RestController
@@ -21,6 +21,7 @@ public class RoleController {
     private final JwtCookieService jwtCookieService;
 
     @PostMapping("/select-role")
+    @Transactional
     public ResponseEntity<Map<String, Object>> selectRole(
             @RequestParam String email,
             @RequestParam String googleId,
