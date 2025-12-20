@@ -1,5 +1,4 @@
 package com.jobsphere.jobsite.controller.auth;
-
 import com.jobsphere.jobsite.constant.UserType;
 import com.jobsphere.jobsite.dto.auth.SetRoleRequest;
 import jakarta.validation.Valid;
@@ -24,28 +23,14 @@ public class RoleController {
     @PostMapping("/select-role")
     @Transactional
     public ResponseEntity<Map<String, Object>> selectRole(
-            @Valid @RequestBody SelectRoleRequest request,
-            HttpServletResponse response) {
+            @RequestParam String email,
+            @RequestParam String googleId,
+            @RequestParam String name,
+            @RequestParam UserType userType,
+            jakarta.servlet.http.HttpServletResponse response) {
 
-        if (request.getTempToken() == null) {
-            throw new AuthException("Temp token required");
-        }
-
-        String email = jwtTokenProvider.getSubject(request.getTempToken());
-        Map<String, Object> claims = jwtTokenProvider.getClaims(request.getTempToken());
-
-        if (!"ROLE_SELECTION".equals(claims.get("purpose"))) {
-            throw new AuthException("Invalid token for role selection");
-        }
-
-        Map<String, Object> result;
-
-        if (request.getGoogleId() != null) {
-            result = googleAuthService.createUserFromGoogle(
-                email, request.getName(), request.getGoogleId(), request.getUserType());
-        } else {
-            result = updateEmailUserRoleManaged(email, request.getUserType());
-        }
+        Map<String, Object> result = googleAuthService.createUserFromGoogle(
+                email, name, googleId, userType);
 
         String accessToken = (String) result.get("token");
         String resultEmail = (String) result.get("email");
@@ -56,32 +41,21 @@ public class RoleController {
         // Set Cookies
         jwtCookieService.setUserCookies(response, accessToken, refreshToken);
 
-
         return ResponseEntity.ok(result);
     }
 
-    private Map<String, Object> updateEmailUserRoleManaged(String email, UserType userType) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new AuthException("User not found"));
+    @PostMapping("/complete-registration")
+    public ResponseEntity<Map<String, Object>> completeRegistration(
+            @Valid @RequestBody SetRoleRequest request,
+            jakarta.servlet.http.HttpServletResponse response) {
 
-        if (user.getUserType() != null) {
-            throw new AuthException("User already has a role assigned");
-        }
+        Map<String, Object> result = authService.finalizeRole(request.getToken(), request.getUserType());
 
-        user.setUserType(userType);
-        user.setLastLogin(Instant.now());
-        // No need to call save(user); the user is managed in the same @Transactional call
+        String accessToken = (String) result.get("token");
+        String refreshToken = (String) result.get("refreshToken");
 
-        String accessToken = jwtTokenProvider.createUserToken(email, userType.name());
-        String refreshToken = authService.createRefreshToken(email);
+        jwtCookieService.setUserCookies(response, accessToken, refreshToken);
 
-        return Map.of(
-            "token", accessToken,
-            "refreshToken", refreshToken,
-            "email", email,
-            "userType", userType,
-            "needsRoleSelection", false,
-            "message", "Role selected successfully"
-        );
+        return ResponseEntity.ok(result);
     }
 }
