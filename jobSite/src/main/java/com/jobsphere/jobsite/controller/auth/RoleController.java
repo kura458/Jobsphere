@@ -1,12 +1,7 @@
 package com.jobsphere.jobsite.controller.auth;
 import com.jobsphere.jobsite.constant.UserType;
-import com.jobsphere.jobsite.config.security.JwtCookieService;
-import com.jobsphere.jobsite.config.security.JwtTokenProvider;
-import com.jobsphere.jobsite.dto.auth.SelectRoleRequest;
-import com.jobsphere.jobsite.exception.AuthException;
-import com.jobsphere.jobsite.model.User;
-import com.jobsphere.jobsite.repository.UserRepository;
-import com.jobsphere.jobsite.service.auth.AuthService;
+import com.jobsphere.jobsite.dto.auth.SetRoleRequest;
+import jakarta.validation.Valid;
 import com.jobsphere.jobsite.service.auth.GoogleAuthService;
 import com.jobsphere.jobsite.service.auth.AuthService;
 import com.jobsphere.jobsite.config.security.JwtCookieService;
@@ -44,6 +39,21 @@ public class RoleController {
         String refreshToken = authService.createRefreshToken(resultEmail);
 
         // Set Cookies
+        jwtCookieService.setUserCookies(response, accessToken, refreshToken);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/complete-registration")
+    public ResponseEntity<Map<String, Object>> completeRegistration(
+            @Valid @RequestBody SetRoleRequest request,
+            jakarta.servlet.http.HttpServletResponse response) {
+
+        Map<String, Object> result = authService.finalizeRole(request.getToken(), request.getUserType());
+
+        String accessToken = (String) result.get("token");
+        String refreshToken = (String) result.get("refreshToken");
+
         jwtCookieService.setUserCookies(response, accessToken, refreshToken);
 
         return ResponseEntity.ok(result);
