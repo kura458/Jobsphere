@@ -38,6 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/auth/refresh",
             "/api/v1/admin/auth/refresh",
             "/api/v1/auth/complete-registration",
+            "/api/v1/auth/oauth-success",
             "/oauth2/authorization/**",
             "/login/oauth2/code/**",
             "/api/v1/public/**",
@@ -54,6 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+        logger.debug(String.format("JWT_FILTER: Processing request to %s", path));
+
         String token = getTokenFromRequest(request);
 
         // If there is no token, continue (security will handle protected endpoints)
@@ -61,8 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-
-        // If token invalid and it came from Authorization header -> return 401
         // immediately.
         String authHeader = request.getHeader("Authorization");
         boolean hasAuthHeader = authHeader != null && authHeader.startsWith("Bearer ");
@@ -79,16 +81,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String email = jwtTokenProvider.getSubject(token);
-        String userType = jwtTokenProvider.getUserType(token);
-
-        if (email == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+        if (email == null) {
             chain.doFilter(request, response);
-            return;
-        }
-
-        String path = request.getRequestURI();
-        if (path.startsWith("/api/v1/admin/") && !"ADMIN".equals(userType)) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
@@ -98,7 +92,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     userDetails, null, userDetails.getAuthorities());
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
+
+            if (path.startsWith("/api/v1/admin/")) {
+                logger.info(String.format("AUTH_SUCCESS: Admin %s accessing %s with authorities %s",
+                        email, path, userDetails.getAuthorities()));
+            }
         } catch (Exception e) {
+            logger.error(String.format("AUTH_ERROR: Failed to load user %s - %s", email, e.getMessage()));
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
