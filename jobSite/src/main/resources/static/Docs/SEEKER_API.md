@@ -102,34 +102,36 @@ Response:
   }
 }
 
-#Seekers Details profile  follow
+
 ---
-1. BIO
-Title: "Senior Software Engineer"
+
+# Seekers Details profile follow
+
+---
+
+1. BIO  
+Title: "Senior Software Engineer"  
 Description: "5+ years experience in Java, Spring Boot, and microservices architecture. Specialized in building scalable backend systems and REST APIs."
 
-2. SECTOR
-Single: "Information Technology"
+2. SECTOR  
+Single: "Information Technology"  
 Multiple: ["Technology", "Software Development", "Fintech"]
 
-3. TAGS
+3. TAGS  
 Examples: ["Backend", "Java", "Spring Boot", "Microservices", "PostgreSQL"]
 
-4. SKILLS
-Examples:
-
-"Java Programming"
-
-"Spring Framework"
-
-"REST API Design"
-
-"Docker"
-
+4. SKILLS  
+Examples:  
+"Java Programming"  
+"Spring Framework"  
+"REST API Design"  
+"Docker"  
 "PostgreSQL"
 
-5. CV
-Option A - Upload: PDF/DOC file upload
+5. CV  
+
+Option A - Upload: PDF/DOC file upload  
+
 Option B - Build:
 
 json
@@ -145,25 +147,21 @@ json
   ],
   "services": ["Backend Development", "API Design"]  or cummmunity service
 }
-6. PROJECTS
-Example:
 
-Title: "E-Commerce Platform"
+6. PROJECTS  
+Example:  
 
-Description: "Full-stack online shopping system"
+Title: "E-Commerce Platform"  
+Description: "Full-stack online shopping system"  
+URL: "https://github.com/user/ecommerce" or live links  
+Image: project-screenshot.jpg  
+Video: project-demo.mp4  
 
-URL: "https://github.com/user/ecommerce" or live links
+7. SOCIAL MEDIA LINKS  
+Examples:  
 
-Image: project-screenshot.jpg
-
-Video: project-demo.mp4
-
-7. SOCIAL MEDIA LINKS
-Examples:
-
-LinkedIn: https://linkedin.com/in/username
-
-GitHub: https://github.com/username
-
+LinkedIn: https://linkedin.com/in/username  
+GitHub: https://github.com/username  
 Portfolio: https://portfolio.dev
+
 ---
