@@ -17,6 +17,7 @@ import com.jobsphere.jobsite.model.seeker.SeekerSkill;
 import com.jobsphere.jobsite.model.seeker.SeekerSector;
 import com.jobsphere.jobsite.model.seeker.SeekerTag;
 import com.jobsphere.jobsite.service.shared.AuthenticationService;
+import com.jobsphere.jobsite.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -164,10 +165,9 @@ public class ApplicationService {
 
         if (!oldStatus.equals(application.getStatus())) {
             notificationService.notifyApplicationStatusUpdate(
-                application.getSeeker().getId(),
-                application.getJob().getTitle(),
-                application.getStatus()
-            );
+                    application.getSeeker().getId(),
+                    application.getJob().getTitle(),
+                    application.getStatus());
         }
 
         return mapToResponse(application);

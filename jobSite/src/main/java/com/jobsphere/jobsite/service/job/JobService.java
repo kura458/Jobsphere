@@ -236,7 +236,7 @@ public class JobService {
         }
     }
 
-    private JobResponse mapToResponse(Job job) {
+    public JobResponse mapToResponse(Job job) {
         long applicantCount = applicationRepository.countByJobId(job.getId());
         return new JobResponse(
                 job.getId(),

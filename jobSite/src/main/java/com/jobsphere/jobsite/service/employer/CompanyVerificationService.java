@@ -106,7 +106,7 @@ public class CompanyVerificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Send notification with code
-        emailNotificationService.sendVerificationCode(user.getEmail(), verificationCode);
+        emailNotificationService.sendVerificationCode(user.getEmail(), verification.getCompanyName(), verificationCode);
 
         log.info("Verification approved for company {} by admin {}", verification.getCompanyName(), adminEmail);
     }
@@ -130,7 +130,8 @@ public class CompanyVerificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Send rejection notification
-        emailNotificationService.sendVerificationRejection(user.getEmail(), verification.getCompanyName(), rejectionReason);
+        emailNotificationService.sendVerificationRejection(user.getEmail(), verification.getCompanyName(),
+                rejectionReason);
 
         // Clean up trade license if needed (simplified)
 
