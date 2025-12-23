@@ -5,6 +5,7 @@ import com.jobsphere.jobsite.model.notification.Notification;
 import com.jobsphere.jobsite.repository.UserRepository;
 import com.jobsphere.jobsite.repository.notification.NotificationRepository;
 import com.jobsphere.jobsite.service.shared.EmailNotificationService;
+import com.jobsphere.jobsite.utils.EmailTemplateBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final EmailNotificationService emailNotificationService;
+    private final EmailTemplateBuilder emailTemplateBuilder;
 
     public Page<Notification> getUserNotifications(UUID userId, Pageable pageable) {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
@@ -100,14 +102,19 @@ public class NotificationService {
     }
 
     @Async
-    public void notifyApplicationStatusUpdate(UUID seekerUserId, String jobTitle, String status) {
+    public void notifyApplicationStatusUpdate(UUID seekerUserId, String jobTitle, String status,
+            String rejectionReason) {
         log.info("Starting notifyApplicationStatusUpdate for seeker: {} and job: {}", seekerUserId, jobTitle);
         String title = "Application Status Update";
-        String message = "Your application for " + jobTitle + " is now " + status.toLowerCase();
+        String statusLower = status.toLowerCase();
+
+        String message = "Your application for " + jobTitle + " is now " + statusLower;
+        if ("REJECTED".equalsIgnoreCase(status) && rejectionReason != null && !rejectionReason.isBlank()) {
+            message += ". Reason: " + rejectionReason;
+        }
+
         String emailSubject = "Application Update - " + jobTitle;
-        String emailContent = "<p>Your application status for <strong>" + jobTitle
-                + "</strong> has been updated to: <strong>" + status + "</strong></p>" +
-                "<p>Please log in to your dashboard for more details.</p>";
+        String emailContent = emailTemplateBuilder.buildApplicationStatusEmail(jobTitle, status, rejectionReason);
 
         createNotificationWithEmail(seekerUserId, title, message, emailSubject, emailContent);
     }

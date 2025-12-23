@@ -76,6 +76,54 @@ public class EmailTemplateBuilder {
         }
     }
 
+    public String buildApplicationStatusEmail(String jobTitle, String status, String rejectionReason) {
+        String statusColor = switch (status.toUpperCase()) {
+            case "APPROVED", "ACCEPTED" -> "#10b981";
+            case "REJECTED" -> "#ef4444";
+            case "INTERVIEW", "INTERVIEWING" -> "#3b82f6";
+            default -> "#1d4ed8";
+        };
+
+        StringBuilder reasonHtml = new StringBuilder();
+        if ("REJECTED".equalsIgnoreCase(status) && rejectionReason != null && !rejectionReason.isBlank()) {
+            reasonHtml
+                    .append("""
+                            <div style="margin-top:20px;padding:20px;background-color:#fef2f2;border-radius:12px;border:1px solid #fee2e2">
+                                <strong style="color:#991b1b;display:block;margin-bottom:8px;font-size:14px;text-transform:uppercase;letter-spacing:1px">Feedback from Employer</strong>
+                                <p style="color:#b91c1c;margin:0;font-style:italic;line-height:1.6">"%s"</p>
+                            </div>
+                            """
+                            .formatted(rejectionReason));
+        }
+
+        return """
+                <div style="font-family:system-ui,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:auto;border:1px solid #e2e8f0;border-radius:24px;overflow:hidden;background-color:#ffffff">
+                    <div style="background:linear-gradient(135deg, #1d4ed8, #1e40af);padding:40px 20px;text-align:center">
+                        <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:900;letter-spacing:-0.5px">JobSphere</h1>
+                        <p style="color:rgba(255,255,255,0.7);margin-top:10px;text-transform:uppercase;font-weight:700;font-size:12px;letter-spacing:2px">Application Update</p>
+                    </div>
+                    <div style="padding:40px 30px">
+                        <p style="font-size:16px;color:#475569;margin-bottom:30px">Hello,</p>
+                        <p style="font-size:18px;color:#1e293b;line-height:1.5;margin-bottom:24px">
+                            The status of your application for <strong style="color:#1d4ed8">%s</strong> has been updated to:
+                        </p>
+                        <div style="display:inline-block;padding:12px 24px;background-color:%s;color:#ffffff;border-radius:12px;font-weight:900;text-transform:uppercase;letter-spacing:1px;font-size:14px;margin-bottom:30px shadow:0 4px 12px rgba(0,0,0,0.1)">
+                            %s
+                        </div>
+                        %s
+                        <div style="margin-top:40px;padding-top:30px;border-top:1px solid #f1f5f9;text-align:center">
+                            <p style="color:#64748b;font-size:14px;margin-bottom:20px">Log in to your dashboard to view more details and next steps.</p>
+                            <a href="https://jobsite.com/seeker/applications" style="display:inline-block;padding:16px 32px;background-color:#1d4ed8;color:#ffffff;text-decoration:none;border-radius:14px;font-weight:700;font-size:14px">Go to Dashboard</a>
+                        </div>
+                    </div>
+                    <div style="background-color:#f8fafc;padding:30px;text-align:center;border-top:1px solid #f1f5f9">
+                        <p style="color:#94a3b8;font-size:12px;margin:0">© 2024 JobSphere. All rights reserved.</p>
+                    </div>
+                </div>
+                """
+                .formatted(jobTitle, statusColor, status, reasonHtml.toString());
+    }
+
     private String loadTemplate(String path) throws Exception {
         ClassPathResource resource = new ClassPathResource("templates/" + path);
         byte[] bytes = FileCopyUtils.copyToByteArray(resource.getInputStream());

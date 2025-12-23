@@ -160,6 +160,10 @@ public class ApplicationService {
             application.setNotes(request.notes());
         }
 
+        if (request.rejectionReason() != null) {
+            application.setRejectionReason(request.rejectionReason());
+        }
+
         application = applicationRepository.save(application);
         log.info("Application updated: {} status: {}", applicationId, application.getStatus());
 
@@ -167,7 +171,8 @@ public class ApplicationService {
             notificationService.notifyApplicationStatusUpdate(
                     application.getSeeker().getId(),
                     application.getJob().getTitle(),
-                    application.getStatus());
+                    application.getStatus(),
+                    application.getRejectionReason());
         }
 
         return mapToResponse(application);
@@ -249,6 +254,7 @@ public class ApplicationService {
                     application.getReviewedAt(),
                     application.getHiredFlag(),
                     application.getNotes(),
+                    application.getRejectionReason(),
                     application.getUpdatedAt());
         } catch (Exception e) {
             log.error("Error mapping application {} to response", application.getId(), e);

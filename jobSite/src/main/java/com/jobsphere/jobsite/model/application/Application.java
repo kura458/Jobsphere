@@ -57,6 +57,9 @@ public class Application {
     @Column(name = "notes")
     private String notes;
 
+    @Column(name = "rejection_reason", length = 1000)
+    private String rejectionReason;
+
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updatedAt;

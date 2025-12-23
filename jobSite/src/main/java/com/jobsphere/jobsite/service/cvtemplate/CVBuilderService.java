@@ -10,6 +10,7 @@ import com.jobsphere.jobsite.repository.UserRepository;
 import com.jobsphere.jobsite.repository.cvtemplate.CVTemplateRepository;
 import com.jobsphere.jobsite.repository.seeker.*;
 import com.jobsphere.jobsite.service.shared.AuthenticationService;
+import com.jobsphere.jobsite.service.shared.PdfGeneratorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class CVBuilderService {
     private final SeekerCVRepository seekerCVRepository;
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
+    private final PdfGeneratorService pdfGeneratorService;
 
     public List<CVTemplateResponse> getActiveTemplates() {
         List<CVTemplate> templates = cvTemplateRepository.findByStatus("ACTIVE");
@@ -71,15 +73,11 @@ public class CVBuilderService {
         return preview;
     }
 
-    public Map<String, Object> prepareDownload(CVBuilderRequest request) {
+    public byte[] prepareDownload(CVBuilderRequest request) {
         CVTemplate template = cvTemplateRepository.findById(request.templateId())
                 .orElseThrow(() -> new ResourceNotFoundException("CV template not found"));
 
-        Map<String, Object> download = new HashMap<>();
-        download.put("template", mapToResponse(template));
-        download.put("data", request.filledData());
-
-        return download;
+        return pdfGeneratorService.generateCV(template.getName(), request.filledData());
     }
 
     @SuppressWarnings("unchecked")
