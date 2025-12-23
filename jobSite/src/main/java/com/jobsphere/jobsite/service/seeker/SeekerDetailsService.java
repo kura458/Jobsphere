@@ -5,7 +5,9 @@ import com.jobsphere.jobsite.dto.seeker.MediaDto;
 import com.jobsphere.jobsite.exception.AuthException;
 import com.jobsphere.jobsite.model.User;
 import com.jobsphere.jobsite.model.seeker.Seeker;
+import com.jobsphere.jobsite.model.seeker.SeekerCV;
 import com.jobsphere.jobsite.repository.UserRepository;
+import com.jobsphere.jobsite.repository.seeker.SeekerCVRepository;
 import com.jobsphere.jobsite.repository.seeker.SeekerRepository;
 import com.jobsphere.jobsite.service.shared.CloudinaryFileService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SeekerDetailsService {
     private final SeekerRepository seekerRepository;
+    private final SeekerCVRepository seekerCVRepository;
     private final UserRepository userRepository;
     private final CloudinaryFileService cloudinaryFileService;
 
@@ -41,13 +44,13 @@ public class SeekerDetailsService {
         User user = getAuthenticatedUser();
         validateSeekerUser(user);
         UUID seekerId = user.getId();
-        
+
         Seeker seeker = seekerRepository.findById(seekerId).orElse(null);
-        
+
         if (seeker == null) {
             return MediaDto.builder().build();
         }
-        
+
         return MediaDto.builder()
                 .profileImageUrl(seeker.getProfileImageUrl())
                 .cvUrl(seeker.getCvUrl())
@@ -59,21 +62,21 @@ public class SeekerDetailsService {
         User user = getAuthenticatedUser();
         validateSeekerUser(user);
         UUID seekerId = user.getId();
-        
+
         Seeker seeker = seekerRepository.findById(seekerId).orElse(null);
         if (seeker == null) {
             seeker = Seeker.builder().id(seekerId).build();
         }
-        
+
         // Delete existing image if present
         if (seeker.getProfileImageUrl() != null) {
             cloudinaryFileService.deleteFile(seeker.getProfileImageUrl());
         }
-        
+
         String imageUrl = cloudinaryFileService.uploadImage(file, "seekers/profile");
         seeker.setProfileImageUrl(imageUrl);
         seekerRepository.save(seeker);
-        
+
         return MediaDto.builder()
                 .profileImageUrl(seeker.getProfileImageUrl())
                 .cvUrl(seeker.getCvUrl())
@@ -85,9 +88,9 @@ public class SeekerDetailsService {
         User user = getAuthenticatedUser();
         validateSeekerUser(user);
         UUID seekerId = user.getId();
-        
+
         Seeker seeker = seekerRepository.findById(seekerId).orElse(null);
-        
+
         if (seeker != null && seeker.getProfileImageUrl() != null) {
             try {
                 cloudinaryFileService.deleteFile(seeker.getProfileImageUrl());
@@ -96,11 +99,11 @@ public class SeekerDetailsService {
             seeker.setProfileImageUrl(null);
             seekerRepository.save(seeker);
         }
-        
+
         if (seeker == null) {
             return MediaDto.builder().build();
         }
-        
+
         return MediaDto.builder()
                 .profileImageUrl(seeker.getProfileImageUrl())
                 .cvUrl(seeker.getCvUrl())
@@ -112,25 +115,53 @@ public class SeekerDetailsService {
         User user = getAuthenticatedUser();
         validateSeekerUser(user);
         UUID seekerId = user.getId();
-        
+
         Seeker seeker = seekerRepository.findById(seekerId).orElse(null);
         if (seeker == null) {
             seeker = Seeker.builder().id(seekerId).build();
         }
-        
+
         // Delete existing CV if present
         if (seeker.getCvUrl() != null) {
             cloudinaryFileService.deleteFile(seeker.getCvUrl());
         }
-        
+
         String cvUrl = cloudinaryFileService.uploadDocument(file, "seekers/cv");
         seeker.setCvUrl(cvUrl);
         seekerRepository.save(seeker);
-        
+
+        // Sync with SeekerCV record for structured profile views
+        final String finalCvUrl = cvUrl;
+        seekerCVRepository.findBySeekerId(seekerId).ifPresentOrElse(
+                cv -> {
+                    cv.setCvUrl(finalCvUrl);
+                    cv.setFileName(file.getOriginalFilename());
+                    cv.setFileSize(formatFileSize(file.getSize()));
+                    seekerCVRepository.save(cv);
+                },
+                () -> {
+                    SeekerCV cv = SeekerCV.builder()
+                            .seekerId(seekerId)
+                            .cvUrl(finalCvUrl)
+                            .fileName(file.getOriginalFilename())
+                            .fileSize(formatFileSize(file.getSize()))
+                            .title("Uploaded CV")
+                            .build();
+                    seekerCVRepository.save(cv);
+                });
+
         return MediaDto.builder()
                 .profileImageUrl(seeker.getProfileImageUrl())
                 .cvUrl(seeker.getCvUrl())
                 .build();
+    }
+
+    private String formatFileSize(long bytes) {
+        if (bytes < 1024)
+            return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(1024));
+        String pre = "KMGTPE".charAt(exp - 1) + "";
+        return String.format("%.1f %sB", bytes / Math.pow(1024, exp), pre);
     }
 
     @Transactional
@@ -138,9 +169,9 @@ public class SeekerDetailsService {
         User user = getAuthenticatedUser();
         validateSeekerUser(user);
         UUID seekerId = user.getId();
-        
+
         Seeker seeker = seekerRepository.findById(seekerId).orElse(null);
-        
+
         if (seeker != null && seeker.getCvUrl() != null) {
             try {
                 cloudinaryFileService.deleteFile(seeker.getCvUrl());
@@ -149,15 +180,14 @@ public class SeekerDetailsService {
             seeker.setCvUrl(null);
             seekerRepository.save(seeker);
         }
-        
+
         if (seeker == null) {
             return MediaDto.builder().build();
         }
-        
+
         return MediaDto.builder()
                 .profileImageUrl(seeker.getProfileImageUrl())
                 .cvUrl(seeker.getCvUrl())
                 .build();
     }
 }
-

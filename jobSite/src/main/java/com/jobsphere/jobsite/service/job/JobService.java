@@ -96,29 +96,38 @@ public class JobService {
     }
 
     private boolean isMatch(Job job, com.jobsphere.jobsite.model.seeker.JobAlert alert) {
-        // Category match
+        // 1. Category match (more lenient)
         if (alert.getCategory() != null && !alert.getCategory().isEmpty()) {
-            if (!alert.getCategory().equalsIgnoreCase(job.getCategory()))
-                return false;
+            String alertCat = alert.getCategory();
+            String jobCat = job.getCategory();
+
+            if (jobCat != null) {
+                boolean match = alertCat.equalsIgnoreCase(jobCat) ||
+                        isCategoryRelated(alertCat, jobCat);
+                if (!match)
+                    return false;
+            }
         }
 
-        // Job Type match
+        // 2. Job Type match
         if (alert.getJobType() != null && !alert.getJobType().isEmpty()) {
             if (!alert.getJobType().equalsIgnoreCase(job.getJobType()))
                 return false;
         }
 
-        // Location match
+        // 3. Location match
         if (alert.getPreferredLocation() != null && !alert.getPreferredLocation().isEmpty()) {
             String jobCity = job.getAddress() != null ? job.getAddress().getCity() : "";
             String jobRegion = job.getAddress() != null ? job.getAddress().getRegion() : "";
-            boolean cityMatch = jobCity != null && jobCity.equalsIgnoreCase(alert.getPreferredLocation());
-            boolean regionMatch = jobRegion != null && jobRegion.equalsIgnoreCase(alert.getPreferredLocation());
+            boolean cityMatch = jobCity != null
+                    && jobCity.toLowerCase().contains(alert.getPreferredLocation().toLowerCase());
+            boolean regionMatch = jobRegion != null
+                    && jobRegion.toLowerCase().contains(alert.getPreferredLocation().toLowerCase());
             if (!cityMatch && !regionMatch)
                 return false;
         }
 
-        // Keyword match
+        // 4. Keyword match
         if (alert.getKeywords() != null && !alert.getKeywords().isEmpty()) {
             String[] keywords = alert.getKeywords().split(",");
             boolean keywordMatched = false;
@@ -126,8 +135,8 @@ public class JobService {
                 String cleanKw = kw.trim().toLowerCase();
                 if (cleanKw.isEmpty())
                     continue;
-                if (job.getTitle().toLowerCase().contains(cleanKw) ||
-                        job.getDescription().toLowerCase().contains(cleanKw)) {
+                if ((job.getTitle() != null && job.getTitle().toLowerCase().contains(cleanKw)) ||
+                        (job.getDescription() != null && job.getDescription().toLowerCase().contains(cleanKw))) {
                     keywordMatched = true;
                     break;
                 }
@@ -137,6 +146,35 @@ public class JobService {
         }
 
         return true;
+    }
+
+    private boolean isCategoryRelated(String alertCat, String jobCat) {
+        String a = alertCat.toLowerCase();
+        String j = jobCat.toLowerCase();
+
+        // Technology Mapping
+        if ((a.contains("tech") || a.contains("it")) && j.equals("technology"))
+            return true;
+        // Marketing/Sales Mapping
+        if ((a.contains("marketing") || a.contains("sales")) && j.equals("marketing"))
+            return true;
+        // Design Mapping
+        if (a.contains("design") && j.equals("design"))
+            return true;
+        // Healthcare Mapping
+        if (a.contains("health") && j.equals("healthcare"))
+            return true;
+        // Finance Mapping
+        if ((a.contains("finance") || a.contains("banking")) && j.equals("finance"))
+            return true;
+        // Education Mapping
+        if (a.contains("education") && j.equals("education"))
+            return true;
+        // Engineering Mapping
+        if (a.contains("engineering") && j.equals("engineering"))
+            return true;
+
+        return a.contains(j) || j.contains(a);
     }
 
     @Transactional(readOnly = true)

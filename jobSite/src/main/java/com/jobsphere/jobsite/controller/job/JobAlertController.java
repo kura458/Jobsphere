@@ -49,6 +49,13 @@ public class JobAlertController {
         return ResponseEntity.ok(jobAlertService.toggleAlert(alertId));
     }
 
+    @PostMapping("/sync-profile")
+    @Operation(summary = "Sync job alerts with seeker profile (Auto-generate if none exist)")
+    public ResponseEntity<Void> syncProfile() {
+        jobAlertService.syncAlertsWithProfile();
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/matched")
     @Operation(summary = "Get jobs matching my alerts")
     public ResponseEntity<List<JobResponse>> getMatchedJobs() {

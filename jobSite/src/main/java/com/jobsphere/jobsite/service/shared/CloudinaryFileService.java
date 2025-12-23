@@ -82,11 +82,16 @@ public class CloudinaryFileService {
 
         String publicId = folder + "/" + UUID.randomUUID();
 
+        String resourceType = "auto";
+        if (file.getContentType() != null && file.getContentType().equalsIgnoreCase("application/pdf")) {
+            resourceType = "image";
+        }
+
         @SuppressWarnings("unchecked")
         Map<String, Object> uploadParams = ObjectUtils.asMap(
                 "public_id", publicId,
                 "folder", folder,
-                "resource_type", "auto",
+                "resource_type", resourceType,
                 "overwrite", true);
 
         @SuppressWarnings("unchecked")
