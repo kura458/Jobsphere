@@ -11,6 +11,8 @@ import com.jobsphere.jobsite.repository.employer.CompanyProfileRepository;
 import com.jobsphere.jobsite.repository.job.JobRepository;
 import com.jobsphere.jobsite.repository.shared.AddressRepository;
 import com.jobsphere.jobsite.repository.application.ApplicationRepository;
+import com.jobsphere.jobsite.repository.seeker.JobAlertRepository;
+import com.jobsphere.jobsite.service.notification.NotificationService;
 import com.jobsphere.jobsite.service.shared.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,8 @@ public class JobService {
     private final AddressRepository addressRepository;
     private final AuthenticationService authenticationService;
     private final ApplicationRepository applicationRepository;
+    private final JobAlertRepository jobAlertRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public JobResponse createJob(JobCreateRequest request) {
@@ -79,7 +83,60 @@ public class JobService {
         job = jobRepository.save(job);
         log.info("Job created: {} for company {}", job.getId(), companyProfile.getCompanyName());
 
+        // Notify matching seekers
+        final Job savedJob = job;
+        jobAlertRepository.findByIsActiveTrue().stream()
+                .filter(alert -> isMatch(savedJob, alert))
+                .forEach(alert -> notificationService.notifyJobAlertMatch(
+                        alert.getSeeker().getId(),
+                        savedJob.getTitle(),
+                        companyProfile.getCompanyName()));
+
         return mapToResponse(job);
+    }
+
+    private boolean isMatch(Job job, com.jobsphere.jobsite.model.seeker.JobAlert alert) {
+        // Category match
+        if (alert.getCategory() != null && !alert.getCategory().isEmpty()) {
+            if (!alert.getCategory().equalsIgnoreCase(job.getCategory()))
+                return false;
+        }
+
+        // Job Type match
+        if (alert.getJobType() != null && !alert.getJobType().isEmpty()) {
+            if (!alert.getJobType().equalsIgnoreCase(job.getJobType()))
+                return false;
+        }
+
+        // Location match
+        if (alert.getPreferredLocation() != null && !alert.getPreferredLocation().isEmpty()) {
+            String jobCity = job.getAddress() != null ? job.getAddress().getCity() : "";
+            String jobRegion = job.getAddress() != null ? job.getAddress().getRegion() : "";
+            boolean cityMatch = jobCity != null && jobCity.equalsIgnoreCase(alert.getPreferredLocation());
+            boolean regionMatch = jobRegion != null && jobRegion.equalsIgnoreCase(alert.getPreferredLocation());
+            if (!cityMatch && !regionMatch)
+                return false;
+        }
+
+        // Keyword match
+        if (alert.getKeywords() != null && !alert.getKeywords().isEmpty()) {
+            String[] keywords = alert.getKeywords().split(",");
+            boolean keywordMatched = false;
+            for (String kw : keywords) {
+                String cleanKw = kw.trim().toLowerCase();
+                if (cleanKw.isEmpty())
+                    continue;
+                if (job.getTitle().toLowerCase().contains(cleanKw) ||
+                        job.getDescription().toLowerCase().contains(cleanKw)) {
+                    keywordMatched = true;
+                    break;
+                }
+            }
+            if (!keywordMatched)
+                return false;
+        }
+
+        return true;
     }
 
     @Transactional(readOnly = true)
