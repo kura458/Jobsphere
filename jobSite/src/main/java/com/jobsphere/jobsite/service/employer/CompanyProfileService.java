@@ -24,6 +24,7 @@ public class CompanyProfileService {
     private final CompanyProfileRepository profileRepository;
     private final CompanyVerificationRepository verificationRepository;
     private final com.jobsphere.jobsite.service.shared.CloudinaryImageService cloudinaryImageService;
+    private final com.jobsphere.jobsite.repository.UserRepository userRepository;
 
     @Transactional
     public CompanyProfileResponse uploadLogo(UUID userId, org.springframework.web.multipart.MultipartFile file)
@@ -149,6 +150,31 @@ public class CompanyProfileService {
         log.info("Company profile updated for user {}", userId);
 
         return mapToResponse(profile);
+    }
+
+    @Transactional
+    public void deleteAccount(UUID userId) {
+        // 1. Soft delete the User
+        com.jobsphere.jobsite.model.User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setActive(false);
+        user.setDeletedAt(java.time.Instant.now());
+        userRepository.save(user);
+
+        // 2. Delete Company Profile and Logo
+        profileRepository.findByUserId(userId).ifPresent(profile -> {
+            if (StringUtils.hasText(profile.getLogoUrl())) {
+                try {
+                    cloudinaryImageService.deleteImage(profile.getLogoUrl());
+                } catch (IOException e) {
+                    log.warn("Failed to delete logo for user {}: {}", userId, e.getMessage());
+                }
+            }
+            profileRepository.delete(profile);
+        });
+
+        log.info("Company account deleted for user {}", userId);
     }
 
     private void validateVerificationAccess(UUID userId) {

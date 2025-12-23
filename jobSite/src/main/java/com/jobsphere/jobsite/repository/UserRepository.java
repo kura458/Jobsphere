@@ -1,4 +1,3 @@
-
 package com.jobsphere.jobsite.repository;
 
 import com.jobsphere.jobsite.model.User;
@@ -7,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
@@ -19,4 +19,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
 
     boolean existsByGoogleId(String googleId);
+
+    List<User> findByUserType(UserType userType);
 }

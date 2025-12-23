@@ -55,4 +55,11 @@ public class CompanyProfileController {
         CompanyProfileResponse response = profileService.uploadLogo(userId, file);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteAccount() {
+        UUID userId = authenticationService.getCurrentUserId();
+        profileService.deleteAccount(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

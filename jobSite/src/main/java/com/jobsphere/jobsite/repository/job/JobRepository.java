@@ -20,6 +20,8 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
 
         Page<Job> findByIsActiveTrue(Pageable pageable);
 
+        List<Job> findByIsActiveTrue();
+
         @Query("SELECT j FROM Job j JOIN FETCH j.companyProfile cp LEFT JOIN j.address a WHERE j.isActive = true " +
                         "AND j.status IN ('OPEN', 'HIRED') " +
                         "AND (:category IS NULL OR :category = '' OR j.category = :category) " +

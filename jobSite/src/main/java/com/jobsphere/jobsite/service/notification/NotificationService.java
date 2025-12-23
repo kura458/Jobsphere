@@ -131,4 +131,26 @@ public class NotificationService {
 
         createNotificationWithEmail(employerUserId, title, message, emailSubject, emailContent);
     }
+
+    @Async
+    public void notifyJobAlertMatch(UUID seekerUserId, String jobTitle, String companyName) {
+        log.info("Notifying job alert match for seeker: {} and job: {}", seekerUserId, jobTitle);
+        String title = "New Job Match Found!";
+        String message = "A new job at " + companyName + " matches your alerts: " + jobTitle;
+        String emailSubject = "Instant Match: " + jobTitle;
+        String emailContent = "<div style='font-family: sans-serif; padding: 20px; color: #1e293b;'>" +
+                "<h2 style='color: #6366f1;'>Exciting Match Found!</h2>" +
+                "<p>We found a new job that matches your saved alerts:</p>" +
+                "<div style='background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin: 20px 0;'>"
+                +
+                "<h3 style='margin: 0; color: #0f172a;'>" + jobTitle + "</h3>" +
+                "<p style='color: #64748b; margin: 5px 0 0;'>" + companyName + "</p>" +
+                "</div>" +
+                "<p>Apply now before it's too late!</p>" +
+                "<a href='#' style='background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;'>View Job Details</a>"
+                +
+                "</div>";
+
+        createNotificationWithEmail(seekerUserId, title, message, emailSubject, emailContent);
+    }
 }

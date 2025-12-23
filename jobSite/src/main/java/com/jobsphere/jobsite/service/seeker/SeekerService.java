@@ -177,9 +177,18 @@ public class SeekerService {
                 .collect(Collectors.toList());
 
         CVDto cv = seekerCVRepository.findBySeekerId(seekerId)
-                .map(c -> CVDto.builder().cvUrl(c.getCvUrl()).fileName(c.getFileName()).fileSize(c.getFileSize())
+                .map(c -> CVDto.builder()
+                        .id(c.getId())
+                        .title(c.getTitle())
+                        .about(c.getAbout())
+                        .cvUrl(c.getCvUrl() != null ? c.getCvUrl() : seeker.getCvUrl())
+                        .fileName(c.getFileName())
+                        .fileSize(c.getFileSize())
+                        .details(c.getDetails())
                         .build())
-                .orElse(null);
+                .orElseGet(() -> seeker.getCvUrl() != null
+                        ? CVDto.builder().cvUrl(seeker.getCvUrl()).fileName("CV.pdf").build()
+                        : null);
 
         return FullProfileResponse.builder()
                 .basicInfo(basicInfo)

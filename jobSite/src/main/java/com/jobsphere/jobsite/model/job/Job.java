@@ -34,31 +34,31 @@ public class Job {
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "job_type", nullable = false, length = 50)
+    @Column(name = "job_type", nullable = false, columnDefinition = "TEXT")
     private String jobType;
 
-    @Column(name = "workplace_type", nullable = false, length = 50)
+    @Column(name = "workplace_type", nullable = false, columnDefinition = "TEXT")
     private String workplaceType;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String category;
 
-    @Column(name = "education_level", nullable = false, length = 100)
+    @Column(name = "education_level", nullable = false, columnDefinition = "TEXT")
     private String educationLevel;
 
-    @Column(name = "gender_requirement", length = 20)
+    @Column(name = "gender_requirement", columnDefinition = "TEXT")
     private String genderRequirement;
 
     @Column(name = "vacancy_count")
     private Integer vacancyCount;
 
-    @Column(name = "experience_level", length = 100)
+    @Column(name = "experience_level", columnDefinition = "TEXT")
     private String experienceLevel;
 
     @Column(name = "experience_description", columnDefinition = "TEXT")
@@ -70,10 +70,10 @@ public class Job {
     @Column(name = "salary_max", precision = 15, scale = 2)
     private BigDecimal salaryMax;
 
-    @Column(name = "compensation_type", length = 50)
+    @Column(name = "compensation_type", columnDefinition = "TEXT")
     private String compensationType;
 
-    @Column(name = "currency", length = 10)
+    @Column(name = "currency", columnDefinition = "TEXT")
     private String currency;
 
     @Column
@@ -83,7 +83,7 @@ public class Job {
     @Builder.Default
     private Boolean isActive = true;
 
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, columnDefinition = "TEXT")
     @Builder.Default
     private String status = "OPEN";
 

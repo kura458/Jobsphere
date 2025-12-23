@@ -3,6 +3,8 @@ package com.jobsphere.jobsite.controller.job;
 import com.jobsphere.jobsite.dto.job.JobCreateRequest;
 import com.jobsphere.jobsite.dto.job.JobResponse;
 import com.jobsphere.jobsite.dto.job.JobUpdateRequest;
+import com.jobsphere.jobsite.dto.seeker.FullProfileResponse;
+import com.jobsphere.jobsite.service.job.JobMatchingService;
 import com.jobsphere.jobsite.service.job.JobService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JobController {
     private final JobService jobService;
+    private final JobMatchingService jobMatchingService;
 
     @PostMapping
     public ResponseEntity<JobResponse> createJob(@Valid @RequestBody JobCreateRequest request) {
@@ -71,5 +75,10 @@ public class JobController {
             @RequestParam String status) {
         JobResponse response = jobService.updateJobStatus(jobId, status);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{jobId}/recommended-candidates")
+    public ResponseEntity<List<FullProfileResponse>> getRecommendedCandidates(@PathVariable UUID jobId) {
+        return ResponseEntity.of(java.util.Optional.ofNullable(jobMatchingService.getRecommendedCandidates(jobId)));
     }
 }
