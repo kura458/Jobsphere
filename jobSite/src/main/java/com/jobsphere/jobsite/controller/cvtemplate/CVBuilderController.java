@@ -43,9 +43,17 @@ public class CVBuilderController {
     }
 
     @PostMapping("/download")
-    @Operation(summary = "Prepare CV for download")
-    public ResponseEntity<Map<String, Object>> downloadCV(@Valid @RequestBody CVBuilderRequest request) {
-        Map<String, Object> download = cvBuilderService.prepareDownload(request);
-        return ResponseEntity.ok(download);
+    @Operation(summary = "Download generated CV as PDF")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadCV(
+            @Valid @RequestBody CVBuilderRequest request) {
+        byte[] pdfBytes = cvBuilderService.prepareDownload(request);
+        org.springframework.core.io.ByteArrayResource resource = new org.springframework.core.io.ByteArrayResource(
+                pdfBytes);
+
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=resume.pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .contentLength(pdfBytes.length)
+                .body(resource);
     }
 }

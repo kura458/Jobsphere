@@ -19,7 +19,7 @@ public class CloudinaryImageService {
 
     private static final String[] ALLOWED_CONTENT_TYPES = {
             "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"
-    };
+    }; 
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
