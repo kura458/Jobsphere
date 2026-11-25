@@ -70,7 +70,24 @@ External integrations such as Google OAuth, email delivery, and Cloudinary also 
    cd Jobsphere/jobSite
    ```
 
-2. Configure the database and required integration settings in your local application configuration. Supply credentials through environment variables or a private local configuration; do not commit passwords, API keys, JWT secrets, or OAuth client secrets.
+2. Configure the required environment variables before starting the application:
+
+   | Variable | Purpose |
+   | --- | --- |
+   | `DB_URL` | PostgreSQL JDBC connection URL |
+   | `DB_USERNAME` | PostgreSQL username |
+   | `DB_PASSWORD` | PostgreSQL password |
+   | `JWT_SECRET` | Secret used to sign JWTs; use a strong, private value |
+   | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+   | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+   | `BREVO_SMTP_USERNAME` | Brevo SMTP username |
+   | `BREVO_SMTP_KEY` | Brevo SMTP key |
+   | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
+   | `CLOUDINARY_API_KEY` | Cloudinary API key |
+   | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+   | `CLOUDINARY_URL` | Optional Cloudinary connection URL; use this instead of the individual Cloudinary values |
+
+   Keep these values private. Do not put real credentials in source files or commit them to Git.
 
 3. Start the application with the Maven wrapper.
 
